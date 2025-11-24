@@ -156,7 +156,7 @@ export const VideoCharacter: React.FC = () => {
   // On mobile (portrait mode with tall aspect ratio), move video downward
   // Formula: the taller the viewport (smaller aspect ratio), the more we shift downward
   const isMobilePortrait = viewportAspect < 0.75; // Typical mobile portrait aspect ratio
-  const verticalOffset = isMobilePortrait ? -viewport.height * 0.1 : 0; // Shift down by 10% of viewport height on mobile
+  const verticalOffset = isMobilePortrait ? -viewport.height * 0.05 : 0; // Shift down by 5% of viewport height on mobile
 
   // Show a loading placeholder with white/light background instead of black
   if (!videoReady || !textureRef.current) {
