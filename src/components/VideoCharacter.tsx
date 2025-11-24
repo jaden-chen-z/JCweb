@@ -15,11 +15,38 @@ export const VideoCharacter: React.FC = () => {
   
   // Texture ref to update it manually
   const textureRef = useRef<THREE.VideoTexture | null>(null);
+  const imageTextureRef = useRef<THREE.Texture | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   // 性能优化：节流控制，减少更新频率
   const lastUpdateTime = useRef(0);
   const targetTimeRef = useRef(0);
   const UPDATE_INTERVAL = 1000 / 30; // 限制到30fps更新视频时间，减少卡顿
+
+  // Initialize background image
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      '/pic.png',
+      (texture) => {
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        imageTextureRef.current = texture;
+        setImageLoaded(true);
+      },
+      undefined,
+      (error) => {
+        console.error('Image loading error:', error);
+      }
+    );
+
+    return () => {
+      if (imageTextureRef.current) {
+        imageTextureRef.current.dispose();
+      }
+    };
+  }, []);
 
   // Initialize video element
   useEffect(() => {
@@ -152,16 +179,34 @@ export const VideoCharacter: React.FC = () => {
     return [scaleX, scaleY, 1] as [number, number, number];
   }, [viewport.width, viewport.height, videoAspect]);
 
-  if (!videoReady || !textureRef.current) return null;
+  // 如果视频和图片都未加载，返回null
+  if (!videoReady && !imageLoaded) return null;
 
   return (
-    <mesh position={[0, 0, -1]} scale={scale}>
-      <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial 
-        map={textureRef.current} 
-        toneMapped={false} // Keep colors exactly as in video
-        side={THREE.FrontSide} // 只渲染一面，提升性能
-      />
-    </mesh>
+    <>
+      {/* 背景图片 - 在视频下方，当视频未加载时显示 */}
+      {imageLoaded && imageTextureRef.current && !videoReady && (
+        <mesh position={[0, 0, -1]} scale={scale}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial 
+            map={imageTextureRef.current} 
+            toneMapped={false}
+            side={THREE.FrontSide}
+          />
+        </mesh>
+      )}
+      
+      {/* 视频 - 在图片上方，当视频加载后显示 */}
+      {videoReady && textureRef.current && (
+        <mesh position={[0, 0, -1]} scale={scale}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial 
+            map={textureRef.current} 
+            toneMapped={false} // Keep colors exactly as in video
+            side={THREE.FrontSide} // 只渲染一面，提升性能
+          />
+        </mesh>
+      )}
+    </>
   );
 };
