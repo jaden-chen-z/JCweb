@@ -87,7 +87,7 @@ export const VideoCharacter: React.FC = () => {
   // --- Aspect Ratio & Cover Logic ---
   // We want the video to cover the screen like CSS object-fit: cover
   const viewportAspect = viewport.width / viewport.height;
-  
+
   let scaleX, scaleY;
   if (viewportAspect > videoAspect) {
     // Viewport is wider than video -> fit width, crop height
@@ -99,13 +99,19 @@ export const VideoCharacter: React.FC = () => {
     scaleY = viewport.height;
   }
 
+  // Mobile optimization: Adjust vertical position based on viewport aspect ratio
+  // On mobile (portrait mode with tall aspect ratio), move video upward
+  // Formula: the taller the viewport (smaller aspect ratio), the more we shift upward
+  const isMobilePortrait = viewportAspect < 0.75; // Typical mobile portrait aspect ratio
+  const verticalOffset = isMobilePortrait ? viewport.height * 0.15 : 0; // Shift up by 15% of viewport height on mobile
+
   if (!videoReady || !textureRef.current) return null;
 
   return (
-    <mesh position={[0, 0, -1]} scale={[scaleX, scaleY, 1]}>
+    <mesh position={[0, verticalOffset, -1]} scale={[scaleX, scaleY, 1]}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial 
-        map={textureRef.current} 
+      <meshBasicMaterial
+        map={textureRef.current}
         toneMapped={false} // Keep colors exactly as in video
         side={THREE.DoubleSide}
       />
