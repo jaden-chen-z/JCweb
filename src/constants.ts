@@ -28,6 +28,6 @@ export const PROJECT_LIST = [
   
   // 替换为您自己的视频链接
   // 为了获得最佳效果，请确保视频编码具有频繁的关键帧（Keyframes）以支持平滑倒放
-  export const VIDEO_URL = "/my-character.mp4"; 
+  export const VIDEO_URL = "/my-character.mp4";  
   // 注意：这里使用示例视频，实际使用时请替换为您录制的"人物旋转360度然后坐下"的视频文件 (mp4/webm)
   

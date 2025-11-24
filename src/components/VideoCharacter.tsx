@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useScroll } from '@react-three/drei';
+import { useScroll, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { VIDEO_URL } from '../constants';
 
@@ -12,6 +12,7 @@ export const VideoCharacter: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [videoAspect, setVideoAspect] = useState(16/9); // 默认比例，加载后更新
+  const [videoError, setVideoError] = useState(false);
 
   // Texture ref to update it manually
   const textureRef = useRef<THREE.VideoTexture | null>(null);
@@ -39,6 +40,10 @@ export const VideoCharacter: React.FC = () => {
     // Error handling
     vid.onerror = (e) => {
       console.error('Video loading error:', e);
+      console.error('Video URL:', VIDEO_URL);
+      console.error('Video readyState:', vid.readyState);
+      console.error('Video networkState:', vid.networkState);
+      setVideoError(true);
       // Still set ready to prevent infinite loading
       setVideoReady(true);
     };
@@ -46,7 +51,6 @@ export const VideoCharacter: React.FC = () => {
     // Important: We don't call vid.play() because we want to control it manually.
     // However, loading metadata is required to know duration.
     vid.onloadedmetadata = () => {
-      setVideoReady(true);
       if (vid.videoWidth && vid.videoHeight) {
         setVideoAspect(vid.videoWidth / vid.videoHeight);
       }
@@ -61,6 +65,7 @@ export const VideoCharacter: React.FC = () => {
     // Canplay event - when enough data is loaded to start playing
     vid.oncanplay = () => {
       console.log('Video can play - ready for rendering');
+      setVideoReady(true);
     };
 
     // For mobile devices, we need to trigger loading more aggressively
@@ -127,16 +132,28 @@ export const VideoCharacter: React.FC = () => {
     scaleY = viewport.height;
   }
 
-  if (!videoReady || !textureRef.current) return null;
-
+  // Always render something, even if video isn't ready
+  // This prevents white screen issues
   return (
-    <mesh position={[0, 0, -1]} scale={[scaleX, scaleY, 1]}>
-      <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial 
-        map={textureRef.current} 
-        toneMapped={false} // Keep colors exactly as in video
-        side={THREE.DoubleSide}
-      />
-    </mesh>
+    <>
+      {videoError ? (
+        <Text position={[0, 0, 0]} fontSize={0.3} color="red" anchorX="center" anchorY="middle">
+          视频加载失败{'\n'}Video failed to load{'\n'}请检查文件路径
+        </Text>
+      ) : videoReady ? (
+        <mesh position={[0, 0, -1]} scale={[scaleX, scaleY, 1]}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={textureRef.current}
+            toneMapped={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ) : (
+        <Text position={[0, 0, 0]} fontSize={0.5} color="black" anchorX="center" anchorY="middle">
+          Loading Video...
+        </Text>
+      )}
+    </>
   );
 };

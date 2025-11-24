@@ -14,7 +14,7 @@ const LoadingScreen = () => (
 
 const App: React.FC = () => {
   return (
-    <div className="h-screen w-screen bg-gradient-to-b from-white to-slate-50 relative">
+    <div className="h-screen w-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative">
       
       {/* 增加负片效果的跟随圆点 */}
       <CustomCursor />
