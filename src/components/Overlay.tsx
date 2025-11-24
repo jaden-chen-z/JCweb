@@ -51,18 +51,19 @@ export const Overlay: React.FC = () => {
     <div className="w-full">
       {/* Section 1: Hero - Clean Layout without Glass Box */}
       <Section align="center" verticalAlign="end" noPadding>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full px-6 py-12 md:py-16"
+          className="w-full px-6 pb-8 md:pb-12 md:py-16"
         >
           <div className="max-w-3xl mx-auto flex flex-col items-center">
-            
-            {/* Scroll Indicator - 仅保留箭头 */}
-            <motion.div 
-              animate={{ y: [0, 8, 0], opacity: [0.4, 1, 0.4] }} 
+
+            {/* Scroll Indicator - 仅保留箭头 - Mobile optimized positioning */}
+            <motion.div
+              animate={{ y: [0, 8, 0], opacity: [0.4, 1, 0.4] }}
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className="mb-4 md:mb-0"
             >
               <svg className="w-15 h-14 text-slate-700 drop-shadow-md" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
