@@ -17,6 +17,7 @@ export const VideoCharacter: React.FC = () => {
   const textureRef = useRef<THREE.VideoTexture | null>(null);
   const imageTextureRef = useRef<THREE.Texture | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageAspect, setImageAspect] = useState(9/16); // 默认竖屏比例，加载后更新
   
   // 性能优化：节流控制，减少更新频率
   const lastUpdateTime = useRef(0);
@@ -32,6 +33,14 @@ export const VideoCharacter: React.FC = () => {
         texture.minFilter = THREE.LinearFilter;
         texture.magFilter = THREE.LinearFilter;
         texture.generateMipmaps = false;
+        
+        // 获取图片的实际宽高比
+        if (texture.image) {
+          const img = texture.image;
+          const aspect = img.width / img.height;
+          setImageAspect(aspect);
+        }
+        
         imageTextureRef.current = texture;
         setImageLoaded(true);
       },
@@ -162,7 +171,7 @@ export const VideoCharacter: React.FC = () => {
 
   // --- Aspect Ratio & Cover Logic ---
   // 性能优化：使用useMemo缓存计算结果
-  const scale = useMemo(() => {
+  const videoScale = useMemo(() => {
     const viewportAspect = viewport.width / viewport.height;
     
     let scaleX, scaleY;
@@ -179,6 +188,24 @@ export const VideoCharacter: React.FC = () => {
     return [scaleX, scaleY, 1] as [number, number, number];
   }, [viewport.width, viewport.height, videoAspect]);
 
+  // 图片的缩放计算，使用图片自身的宽高比
+  const imageScale = useMemo(() => {
+    const viewportAspect = viewport.width / viewport.height;
+    
+    let scaleX, scaleY;
+    if (viewportAspect > imageAspect) {
+      // Viewport is wider than image -> fit width, crop height
+      scaleX = viewport.width;
+      scaleY = viewport.width / imageAspect;
+    } else {
+      // Viewport is taller than image -> fit height, crop width
+      scaleX = viewport.height * imageAspect;
+      scaleY = viewport.height;
+    }
+    
+    return [scaleX, scaleY, 1] as [number, number, number];
+  }, [viewport.width, viewport.height, imageAspect]);
+
   // 如果视频和图片都未加载，返回null
   if (!videoReady && !imageLoaded) return null;
 
@@ -186,7 +213,7 @@ export const VideoCharacter: React.FC = () => {
     <>
       {/* 背景图片 - 在视频下方，当视频未加载时显示 */}
       {imageLoaded && imageTextureRef.current && !videoReady && (
-        <mesh position={[0, 0, -1]} scale={scale}>
+        <mesh position={[0, 0, -1]} scale={imageScale}>
           <planeGeometry args={[1, 1]} />
           <meshBasicMaterial 
             map={imageTextureRef.current} 
@@ -198,7 +225,7 @@ export const VideoCharacter: React.FC = () => {
       
       {/* 视频 - 在图片上方，当视频加载后显示 */}
       {videoReady && textureRef.current && (
-        <mesh position={[0, 0, -1]} scale={scale}>
+        <mesh position={[0, 0, -1]} scale={videoScale}>
           <planeGeometry args={[1, 1]} />
           <meshBasicMaterial 
             map={textureRef.current} 
