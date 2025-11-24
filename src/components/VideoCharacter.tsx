@@ -18,8 +18,10 @@ export const VideoCharacter: React.FC = () => {
 
   // Initialize video element
   useEffect(() => {
+    console.log('[VideoCharacter] Initializing video element...');
     const vid = document.createElement('video');
     vid.src = VIDEO_URL;
+    console.log('[VideoCharacter] Video URL:', VIDEO_URL);
     vid.crossOrigin = 'Anonymous';
     vid.loop = false;
     vid.muted = true;
@@ -29,19 +31,24 @@ export const VideoCharacter: React.FC = () => {
     // Error handling
     vid.onerror = (e) => {
       console.error('Video loading error:', e);
-      // Still set ready to prevent infinite loading
-      setVideoReady(true);
+      console.error('Video URL:', VIDEO_URL);
+      console.error('Video error details:', vid.error);
+      // Don't set ready to true on error - let the app show a fallback
+      setVideoReady(false);
     };
     
     // Important: We don't call vid.play() because we want to control it manually.
     // However, loading metadata is required to know duration.
     vid.onloadedmetadata = () => {
+      console.log('[VideoCharacter] Video metadata loaded successfully');
+      console.log('[VideoCharacter] Video dimensions:', vid.videoWidth, 'x', vid.videoHeight);
+      console.log('[VideoCharacter] Video duration:', vid.duration);
       setVideoReady(true);
       if (vid.videoWidth && vid.videoHeight) {
         setVideoAspect(vid.videoWidth / vid.videoHeight);
       }
       // Force a seek to 0 to ensure texture is ready
-      vid.currentTime = 0; 
+      vid.currentTime = 0;
     };
 
     videoRef.current = vid;
