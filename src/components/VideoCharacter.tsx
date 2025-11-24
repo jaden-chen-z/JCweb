@@ -24,35 +24,80 @@ export const VideoCharacter: React.FC = () => {
     vid.loop = false;
     vid.muted = true;
     vid.playsInline = true;
-    vid.preload = 'auto';
-    
+
+    // Critical mobile-specific attributes
+    vid.setAttribute('playsinline', 'true');
+    vid.setAttribute('webkit-playsinline', 'true');
+    vid.setAttribute('x5-playsinline', 'true'); // WeChat browser support
+    vid.setAttribute('x5-video-player-type', 'h5'); // WeChat browser support
+    vid.setAttribute('x5-video-player-fullscreen', 'false'); // WeChat browser support
+
+    // Use 'metadata' instead of 'auto' for better mobile compatibility
+    vid.preload = 'metadata';
+
+    // Disable remote playback for better inline control
+    vid.disableRemotePlayback = true;
+
     // Error handling
     vid.onerror = (e) => {
       console.error('Video loading error:', e);
+      console.error('Video error details:', {
+        error: vid.error,
+        networkState: vid.networkState,
+        readyState: vid.readyState
+      });
       // Still set ready to prevent infinite loading
       setVideoReady(true);
     };
-    
+
     // Important: We don't call vid.play() because we want to control it manually.
     // However, loading metadata is required to know duration.
     vid.onloadedmetadata = () => {
+      console.log('Video metadata loaded successfully');
       setVideoReady(true);
       if (vid.videoWidth && vid.videoHeight) {
         setVideoAspect(vid.videoWidth / vid.videoHeight);
       }
       // Force a seek to 0 to ensure texture is ready
-      vid.currentTime = 0; 
+      vid.currentTime = 0;
+
+      // Attempt to load first frame on mobile by briefly playing and pausing
+      const loadFirstFrame = async () => {
+        try {
+          await vid.play();
+          vid.pause();
+          vid.currentTime = 0;
+        } catch (err) {
+          console.warn('Could not pre-load first frame:', err);
+        }
+      };
+      loadFirstFrame();
+    };
+
+    // Add loadeddata event for additional reliability
+    vid.onloadeddata = () => {
+      console.log('Video data loaded');
+    };
+
+    // Monitor loading progress
+    vid.onprogress = () => {
+      if (vid.buffered.length > 0) {
+        console.log('Video buffering progress:', vid.buffered.end(0));
+      }
     };
 
     videoRef.current = vid;
-    
+
     // Create texture once
     const texture = new THREE.VideoTexture(vid);
     // LinearFilter is smoother for scaling
-    texture.minFilter = THREE.LinearFilter; 
+    texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
     texture.format = THREE.RGBAFormat; // Assuming video might have alpha or just RGB
     textureRef.current = texture;
+
+    // Force initial texture update
+    texture.needsUpdate = true;
 
     return () => {
       vid.pause();
@@ -65,7 +110,7 @@ export const VideoCharacter: React.FC = () => {
   useFrame((_state, delta) => {
     if (!videoRef.current || !videoReady) return;
     const vid = videoRef.current;
-    
+
     // 1. Get Scroll Offset (0 to 1)
     const targetProgress = scroll.offset;
 
@@ -81,6 +126,11 @@ export const VideoCharacter: React.FC = () => {
     // Increase lambda (e.g., 20) for stiffer control, decrease (e.g., 5) for more loose/heavy feel.
     if (Math.abs(vid.currentTime - targetTime) > 0.01) {
       vid.currentTime = THREE.MathUtils.damp(vid.currentTime, targetTime, 10, delta);
+    }
+
+    // Force texture update for mobile devices
+    if (textureRef.current) {
+      textureRef.current.needsUpdate = true;
     }
   });
 
