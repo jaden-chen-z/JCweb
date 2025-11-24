@@ -13,7 +13,8 @@ export const Experience3D: React.FC = () => {
       */}
 
       {/* Scroll Controls - Damping adds smoothness to the scroll bar itself */}
-      <ScrollControls pages={6} damping={0.3}>
+      {/* 微信浏览器优化：增加pages确保最后一部分可以完整显示 */}
+      <ScrollControls pages={6.5} damping={0.3}>
         
         {/* The Video Component controlled by scroll */}
         <VideoCharacter />

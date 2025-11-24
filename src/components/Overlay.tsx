@@ -191,7 +191,8 @@ export const Overlay: React.FC = () => {
       </Section>
 
       {/* Section 6: Contact */}
-      <Section align="center" className="pb-20">
+      {/* 微信浏览器优化：增加底部padding确保内容完整显示 */}
+      <Section align="center" className="pb-32 md:pb-40">
         <motion.div {...fadeInUp} className="text-center w-full px-4 contact-section">
           <h2 className="contact-title font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 mb-8 drop-shadow-sm">
             Let's Collaborate.

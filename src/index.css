@@ -32,6 +32,12 @@ body {
   bottom: 0;
   /* 移动端安全区域支持 */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* 微信浏览器优化：防止页面被缩放 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* 微信浏览器优化：禁用长按菜单 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* 固定竖屏9:16比例的容器（高:宽 = 16:9） */
@@ -131,6 +137,15 @@ body {
 @media (max-width: 768px) {
   .scroll-indicator {
     margin-bottom: 15vh; /* 移动端稍微调整 */
+  }
+}
+
+/* 微信浏览器优化 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  /* 微信浏览器特定样式 */
+  .aspect-content {
+    /* 确保在微信浏览器中正确显示 */
+    -webkit-overflow-scrolling: touch;
   }
 }
 

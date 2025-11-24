@@ -67,18 +67,25 @@ export const VideoCharacter: React.FC = () => {
     vid.playsInline = true;
     vid.preload = 'auto';
     
-    // 移动端优化：设置视频属性以确保在移动设备上正确加载
+    // 微信/X5内核优化：设置视频属性以确保在微信浏览器中正确加载
     vid.setAttribute('playsinline', 'true');
     vid.setAttribute('webkit-playsinline', 'true');
     vid.setAttribute('x5-playsinline', 'true'); // 腾讯X5内核支持
     vid.setAttribute('x5-video-player-type', 'h5');
     vid.setAttribute('x5-video-player-fullscreen', 'false');
+    vid.setAttribute('x5-video-orientation', 'portrait');
+    // 微信浏览器特殊处理：禁用自动全屏
+    vid.setAttribute('controls', 'false');
+    vid.setAttribute('disablePictureInPicture', 'true');
     
     // Error handling
     vid.onerror = (e) => {
       console.error('Video loading error:', e);
       setVideoReady(true);
     };
+    
+    // 检测是否为微信浏览器
+    const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
     
     // 移动端优化：添加loadeddata事件作为备用
     vid.onloadeddata = () => {
@@ -88,6 +95,12 @@ export const VideoCharacter: React.FC = () => {
           setVideoAspect(vid.videoWidth / vid.videoHeight);
         }
         vid.currentTime = 0;
+        // 微信浏览器：尝试播放以确保视频加载
+        if (isWeChat) {
+          vid.play().catch(err => {
+            console.log('Video play prevented:', err);
+          });
+        }
       }
     };
     
@@ -100,6 +113,12 @@ export const VideoCharacter: React.FC = () => {
       }
       // Force a seek to 0 to ensure texture is ready
       vid.currentTime = 0;
+      // 微信浏览器：尝试播放以确保视频加载
+      if (isWeChat) {
+        vid.play().catch(err => {
+          console.log('Video play prevented:', err);
+        });
+      }
     };
     
     // 预加载优化：当视频可以播放时确保纹理更新
@@ -108,6 +127,15 @@ export const VideoCharacter: React.FC = () => {
         textureRef.current.needsUpdate = true;
       }
     };
+    
+    // 微信浏览器：添加更多事件监听以确保视频加载
+    if (isWeChat) {
+      vid.oncanplaythrough = () => {
+        if (textureRef.current) {
+          textureRef.current.needsUpdate = true;
+        }
+      };
+    }
     
     // 移动端优化：尝试加载视频
     vid.load();
