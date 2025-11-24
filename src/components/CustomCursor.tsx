@@ -1,32 +1,61 @@
-import React, { useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const CustomCursor: React.FC = () => {
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
-
-  // 平滑的弹簧动画配置，使跟随有轻微的延迟感，更自然
-  const springConfig = { damping: 20, stiffness: 150, mass: 0.5 };
-  const x = useSpring(mouseX, springConfig);
-  const y = useSpring(mouseY, springConfig);
+  // 状态：记录触摸坐标和激活状态
+  const [touch, setTouch] = useState<{ x: number; y: number; active: boolean }>({
+    x: 0,
+    y: 0,
+    active: false
+  });
 
   useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
-      // 设置位置，减去 16px 是为了让 32px 的圆心对准鼠标尖端
-      mouseX.set(e.clientX - 16);
-      mouseY.set(e.clientY - 16);
+    // 触摸开始和移动时的处理函数
+    const updateTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) {
+        setTouch({ x: t.clientX, y: t.clientY, active: true });
+      }
     };
 
-    window.addEventListener('mousemove', moveCursor);
-    return () => {
-      window.removeEventListener('mousemove', moveCursor);
+    // 触摸结束时的处理函数
+    const endTouch = () => {
+      setTouch(prev => ({ ...prev, active: false }));
     };
-  }, [mouseX, mouseY]);
+
+    // 添加事件监听器 (passive: true 优化滚动性能)
+    window.addEventListener('touchstart', updateTouch, { passive: true });
+    window.addEventListener('touchmove', updateTouch, { passive: true });
+    window.addEventListener('touchend', endTouch);
+
+    return () => {
+      window.removeEventListener('touchstart', updateTouch);
+      window.removeEventListener('touchmove', updateTouch);
+      window.removeEventListener('touchend', endTouch);
+    };
+  }, []);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 w-8 h-8 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
-      style={{ x, y }}
-    />
+    <AnimatePresence>
+      {touch.active && (
+        <motion.div
+          // 初始状态：较小的半透明圆
+          initial={{ scale: 0.5, opacity: 0.5 }}
+          // 动画状态：逐渐变大（2.5倍），变为完全不透明
+          animate={{ scale: 2.5, opacity: 1 }}
+          // 离开状态：缩小并消失
+          exit={{ scale: 0, opacity: 0 }}
+          // 动画过渡：0.5秒缓出，营造柔和的扩散感
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          // 样式：白色圆圈，mix-blend-difference 实现反色，z-index 确保在最上层
+          className="fixed top-0 left-0 w-16 h-16 bg-white rounded-full mix-blend-difference pointer-events-none z-[9999]"
+          style={{
+            // 通过坐标偏移将圆心对准手指接触点 (w-16 = 64px, offset 32px)
+            x: touch.x - 32,
+            y: touch.y - 32
+          }}
+        />
+      )}
+    </AnimatePresence>
   );
 };

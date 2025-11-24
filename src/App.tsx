@@ -14,30 +14,32 @@ const LoadingScreen = () => (
 
 const App: React.FC = () => {
   return (
-    <div className="h-screen w-screen bg-gradient-to-b from-white to-slate-50 relative">
-      
-      {/* 增加负片效果的跟随圆点 */}
-      <CustomCursor />
+    <div className="fixed-aspect-container">
+      <div className="aspect-content">
+        
+        {/* 增加负片效果的跟随圆点 */}
+        <CustomCursor />
 
-      {/* 
-         Canvas handles the 3D Context. 
-         Shadows enabled for depth.
-         Camera field of view adjusted for better portrait framing.
-      */}
-      <Canvas 
-        shadows 
-        camera={{ position: [0, 0, 8], fov: 40 }}
-        className="w-full h-full"
-      >
-        <Suspense fallback={null}>
-           <Experience3D />
+        {/* 
+           Canvas handles the 3D Context. 
+           Shadows enabled for depth.
+           Camera field of view adjusted for better portrait framing.
+        */}
+        <Canvas 
+          shadows 
+          camera={{ position: [0, 0, 8], fov: 40 }}
+          className="absolute inset-0 w-full h-full"
+        >
+          <Suspense fallback={null}>
+             <Experience3D />
+          </Suspense>
+        </Canvas>
+
+        {/* Simple visual fallback for suspense if needed, though ScrollControls usually handles mounting well */}
+        <Suspense fallback={<LoadingScreen />}>
+          {/* Preload critical assets if any */}
         </Suspense>
-      </Canvas>
-
-      {/* Simple visual fallback for suspense if needed, though ScrollControls usually handles mounting well */}
-      <Suspense fallback={<LoadingScreen />}>
-        {/* Preload critical assets if any */}
-      </Suspense>
+      </div>
     </div>
   );
 };

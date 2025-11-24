@@ -31,7 +31,7 @@ const Section: React.FC<SectionProps> = ({
   const containerWidthClass = noPadding ? 'w-full max-w-none' : 'max-w-2xl';
   
   return (
-    <section className={`h-screen w-screen flex flex-col ${verticalAlignClass} ${horizontalAlignClass} ${paddingClass} pointer-events-none ${className}`}>
+    <section className={`w-full flex flex-col ${verticalAlignClass} ${horizontalAlignClass} ${paddingClass} pointer-events-none ${className}`} style={{ height: '100vh', minHeight: '100vh' }}>
       <div className={`${containerWidthClass} pointer-events-auto ${textAlignClass}`}>
         {children}
       </div>
@@ -191,23 +191,23 @@ export const Overlay: React.FC = () => {
 
       {/* Section 6: Contact */}
       <Section align="center" className="pb-20">
-        <motion.div {...fadeInUp} className="text-center w-full px-4">
-          <h2 className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 mb-8 drop-shadow-sm">
+        <motion.div {...fadeInUp} className="text-center w-full px-4 contact-section">
+          <h2 className="contact-title font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 mb-8 drop-shadow-sm">
             Let's Collaborate.
           </h2>
-          <p className="text-xl md:text-3xl text-slate-600 mb-12 font-medium">
+          <p className="contact-subtitle text-slate-600 mb-12 font-medium">
             "Looking forward to creating value in reality or the metaverse."
           </p>
           
-          <div className="flex flex-col md:flex-row gap-6 justify-center">
-             <a href="mailto:jadenttk@gmail.com" className="px-10 py-5 bg-slate-900 text-white rounded-full font-bold text-lg hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center contact-buttons">
+             <a href="mailto:jadenttk@gmail.com" className="contact-button px-10 py-5 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
                Get in Touch
              </a>
              <a 
                href="https://xhslink.com/m/4hRLqnR6IYa" 
                target="_blank" 
                rel="noopener noreferrer"
-               className="px-10 py-5 bg-white/80 backdrop-blur-md text-slate-900 border border-slate-200 rounded-full font-bold text-lg hover:bg-white transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+               className="contact-button px-10 py-5 bg-white/80 backdrop-blur-md text-slate-900 border border-slate-200 rounded-full font-bold hover:bg-white transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
              >
                小红书：@Jaden杰登
              </a>

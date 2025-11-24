@@ -6,6 +6,58 @@
 body {
   overflow: hidden; /* 让 R3F ScrollControls 接管滚动 */
   background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+/* 固定竖屏9:16比例的容器（高:宽 = 16:9） */
+.fixed-aspect-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+/* 竖屏9:16比例的内容区域（高:宽 = 16:9，即 aspect-ratio: 9/16） */
+.aspect-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  aspect-ratio: 9 / 16;
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  overflow: hidden; /* 确保内容不会溢出 */
+  contain: layout style paint; /* 优化性能，确保内容在容器内 */
+}
+
+/* 确保 ScrollControls 使用容器高度 */
+.aspect-content canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 如果屏幕高度大于9:16比例（屏幕更高），则固定宽度，高度自适应 */
+@media (min-aspect-ratio: 9/16) {
+  .aspect-content {
+    width: calc(100vh * 9 / 16);
+    height: 100vh;
+    max-width: calc(100vh * 9 / 16);
+  }
+}
+
+/* 如果屏幕宽度大于9:16比例（屏幕更宽），则固定高度，宽度自适应 */
+@media (max-aspect-ratio: 9/16) {
+  .aspect-content {
+    width: 100vw;
+    height: calc(100vw * 16 / 9);
+    max-height: calc(100vw * 16 / 9);
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -15,5 +67,30 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Contact Section - 固定尺寸，不受容器宽度影响 */
+.contact-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact-title {
+  font-size: clamp(2.5rem, 10vh, 4rem);
+  line-height: 1.1;
+}
+
+.contact-subtitle {
+  font-size: clamp(1rem, 3vh, 1.5rem);
+  line-height: 1.5;
+}
+
+.contact-buttons {
+  font-size: clamp(0.875rem, 2vh, 1rem);
+}
+
+.contact-button {
+  font-size: clamp(0.875rem, 2vh, 1rem);
+  padding: clamp(0.75rem, 2vh, 1.25rem) clamp(1.5rem, 4vh, 2.5rem);
 }
 
