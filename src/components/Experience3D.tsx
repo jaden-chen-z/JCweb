@@ -19,13 +19,13 @@ export const Experience3D: React.FC = () => {
         <VideoCharacter />
         
         {/* Optional: Keep Sparkles for depth, put them in front of video */}
-        {/* 性能优化：移动端进一步减少粒子数量 */}
+        {/* 性能优化：减少粒子数量以提升帧率 */}
         <Sparkles 
-          count={30} 
+          count={40} 
           scale={10} 
-          size={1.8} 
-          speed={0.35} 
-          opacity={0.35} 
+          size={2} 
+          speed={0.4} 
+          opacity={0.4} 
           color="#10b981" 
           position={[0, 0, 1]} // Bring slightly forward
         />

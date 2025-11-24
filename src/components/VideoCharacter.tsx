@@ -31,13 +31,6 @@ export const VideoCharacter: React.FC = () => {
     vid.playsInline = true;
     vid.preload = 'auto';
     
-    // 性能优化：降低视频质量以提升性能（移动端）
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      // 移动端可以设置更低的预加载策略
-      vid.preload = 'metadata';
-    }
-    
     // 移动端优化：设置视频属性以确保在移动设备上正确加载
     vid.setAttribute('playsinline', 'true');
     vid.setAttribute('webkit-playsinline', 'true');
@@ -47,58 +40,30 @@ export const VideoCharacter: React.FC = () => {
     
     // Error handling
     vid.onerror = (e) => {
-      console.error('Video loading error:', e, 'URL:', VIDEO_URL);
-      // 尝试fallback到mp4（如果webm失败）
-      if (VIDEO_URL.endsWith('.webm')) {
-        const mp4Url = VIDEO_URL.replace('.webm', '.mp4');
-        console.log('Trying fallback to:', mp4Url);
-        vid.src = mp4Url;
-        vid.load();
-      } else {
-        setVideoReady(true);
-      }
+      console.error('Video loading error:', e);
+      setVideoReady(true);
     };
-    
-    // 使用ref来跟踪是否已设置ready，避免状态依赖问题
-    let isReadySet = false;
     
     // 移动端优化：添加loadeddata事件作为备用
     vid.onloadeddata = () => {
-      if (!isReadySet) {
-        isReadySet = true;
+      if (!videoReady) {
         setVideoReady(true);
         if (vid.videoWidth && vid.videoHeight) {
           setVideoAspect(vid.videoWidth / vid.videoHeight);
         }
         vid.currentTime = 0;
-        
-        // 移动端：短暂播放以确保视频可以正确显示
-        if (isMobile) {
-          vid.play().then(() => {
-            vid.pause();
-            vid.currentTime = 0;
-            if (textureRef.current) {
-              textureRef.current.needsUpdate = true;
-            }
-          }).catch(err => {
-            console.warn('Video play failed:', err);
-          });
-        }
       }
     };
     
     // Important: We don't call vid.play() because we want to control it manually.
     // However, loading metadata is required to know duration.
     vid.onloadedmetadata = () => {
-      if (!isReadySet) {
-        isReadySet = true;
-        setVideoReady(true);
-        if (vid.videoWidth && vid.videoHeight) {
-          setVideoAspect(vid.videoWidth / vid.videoHeight);
-        }
-        // Force a seek to 0 to ensure texture is ready
-        vid.currentTime = 0;
+      setVideoReady(true);
+      if (vid.videoWidth && vid.videoHeight) {
+        setVideoAspect(vid.videoWidth / vid.videoHeight);
       }
+      // Force a seek to 0 to ensure texture is ready
+      vid.currentTime = 0;
     };
     
     // 预加载优化：当视频可以播放时确保纹理更新
@@ -118,11 +83,8 @@ export const VideoCharacter: React.FC = () => {
     // 性能优化：使用更高效的纹理过滤
     texture.minFilter = THREE.LinearFilter; 
     texture.magFilter = THREE.LinearFilter;
-    // 性能优化：webm格式使用RGBFormat可能更高效（如果视频没有alpha通道）
-    // 如果有alpha通道或需要更好的兼容性，使用RGBAFormat
-    texture.format = THREE.RGBAFormat;
+    texture.format = THREE.RGBAFormat; // 恢复RGBA格式以确保兼容性
     texture.generateMipmaps = false; // 禁用mipmap生成，提升性能
-    texture.flipY = false; // webm通常不需要翻转
     textureRef.current = texture;
     
     // 确保纹理需要更新
@@ -143,6 +105,11 @@ export const VideoCharacter: React.FC = () => {
     const vid = videoRef.current;
     const now = performance.now();
     
+    // 确保纹理持续更新
+    if (textureRef.current) {
+      textureRef.current.needsUpdate = true;
+    }
+    
     // 1. Get Scroll Offset (0 to 1)
     const targetProgress = scroll.offset;
 
@@ -160,11 +127,6 @@ export const VideoCharacter: React.FC = () => {
       if (Math.abs(currentTime - targetTime) > 0.01) {
         const newTime = THREE.MathUtils.damp(currentTime, targetTime, 8, delta);
         vid.currentTime = newTime;
-        
-        // 性能优化：只在时间改变时更新纹理，而不是每帧都更新
-        if (textureRef.current) {
-          textureRef.current.needsUpdate = true;
-        }
       }
       
       lastUpdateTime.current = now;
