@@ -87,7 +87,7 @@ export const VideoCharacter: React.FC = () => {
   // --- Aspect Ratio & Cover Logic ---
   // We want the video to cover the screen like CSS object-fit: cover
   const viewportAspect = viewport.width / viewport.height;
-  
+
   let scaleX, scaleY;
   if (viewportAspect > videoAspect) {
     // Viewport is wider than video -> fit width, crop height
@@ -104,8 +104,8 @@ export const VideoCharacter: React.FC = () => {
   return (
     <mesh position={[0, 0, -1]} scale={[scaleX, scaleY, 1]}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial 
-        map={textureRef.current} 
+      <meshBasicMaterial
+        map={textureRef.current}
         toneMapped={false} // Keep colors exactly as in video
         side={THREE.DoubleSide}
       />

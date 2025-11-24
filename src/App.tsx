@@ -14,20 +14,21 @@ const LoadingScreen = () => (
 
 const App: React.FC = () => {
   return (
-    <div className="h-screen w-screen bg-gradient-to-b from-white to-slate-50 relative">
-      
+    <div className="h-screen w-screen bg-gradient-to-b from-white to-slate-50 relative" style={{ margin: 0, padding: 0 }}>
+
       {/* 增加负片效果的跟随圆点 */}
       <CustomCursor />
 
-      {/* 
-         Canvas handles the 3D Context. 
+      {/*
+         Canvas handles the 3D Context.
          Shadows enabled for depth.
          Camera field of view adjusted for better portrait framing.
       */}
-      <Canvas 
-        shadows 
+      <Canvas
+        shadows
         camera={{ position: [0, 0, 8], fov: 40 }}
         className="w-full h-full"
+        style={{ display: 'block', margin: 0, padding: 0 }}
       >
         <Suspense fallback={null}>
            <Experience3D />
