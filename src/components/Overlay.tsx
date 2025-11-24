@@ -55,7 +55,7 @@ export const Overlay: React.FC = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full px-6 py-12 md:py-16"
+          className="w-full px-6 pb-20"
         >
           <div className="max-w-3xl mx-auto flex flex-col items-center">
             

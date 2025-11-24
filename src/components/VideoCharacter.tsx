@@ -102,7 +102,7 @@ export const VideoCharacter: React.FC = () => {
   if (!videoReady || !textureRef.current) return null;
 
   return (
-    <mesh position={[0, 0, -1]} scale={[scaleX, scaleY, 1]}>
+    <mesh position={[0, 0.15, -1]} scale={[scaleX, scaleY, 1]}>
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial 
         map={textureRef.current} 
