@@ -31,14 +31,28 @@ export const VideoCharacter: React.FC = () => {
     vid.playsInline = true;
     vid.preload = 'auto';
     
-    // 性能优化：设置视频属性以减少卡顿
+    // 移动端优化：设置视频属性以确保在移动设备上正确加载
     vid.setAttribute('playsinline', 'true');
     vid.setAttribute('webkit-playsinline', 'true');
+    vid.setAttribute('x5-playsinline', 'true'); // 腾讯X5内核支持
+    vid.setAttribute('x5-video-player-type', 'h5');
+    vid.setAttribute('x5-video-player-fullscreen', 'false');
     
     // Error handling
     vid.onerror = (e) => {
       console.error('Video loading error:', e);
       setVideoReady(true);
+    };
+    
+    // 移动端优化：添加loadeddata事件作为备用
+    vid.onloadeddata = () => {
+      if (!videoReady) {
+        setVideoReady(true);
+        if (vid.videoWidth && vid.videoHeight) {
+          setVideoAspect(vid.videoWidth / vid.videoHeight);
+        }
+        vid.currentTime = 0;
+      }
     };
     
     // Important: We don't call vid.play() because we want to control it manually.
@@ -58,6 +72,9 @@ export const VideoCharacter: React.FC = () => {
         textureRef.current.needsUpdate = true;
       }
     };
+    
+    // 移动端优化：尝试加载视频
+    vid.load();
 
     videoRef.current = vid;
     

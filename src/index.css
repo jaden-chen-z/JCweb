@@ -3,11 +3,35 @@
 @tailwind utilities;
 
 /* 这里可以加上你原来 html head 里的样式，比如隐藏滚动条 */
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* 移动端修复：防止地址栏导致的白色间隙 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 body {
   overflow: hidden; /* 让 R3F ScrollControls 接管滚动 */
   background-color: #ffffff;
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
+  /* 移动端修复：防止地址栏导致的白色间隙 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* 移动端安全区域支持 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* 固定竖屏9:16比例的容器（高:宽 = 16:9） */
@@ -17,10 +41,15 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
+  /* 移动端修复：使用100dvh替代100vh，考虑动态视口高度 */
+  height: 100dvh;
+  min-height: -webkit-fill-available; /* iOS Safari支持 */
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
+  /* 移动端修复：防止地址栏导致的白色间隙 */
+  overflow: hidden;
 }
 
 /* 竖屏9:16比例的内容区域（高:宽 = 16:9，即 aspect-ratio: 9/16） */
@@ -92,5 +121,16 @@ body {
 .contact-button {
   font-size: clamp(0.875rem, 2vh, 1rem);
   padding: clamp(0.75rem, 2vh, 1.25rem) clamp(1.5rem, 4vh, 2.5rem);
+}
+
+/* 向下指引箭头位置调整 - 位于屏幕下方1/3位置 */
+.scroll-indicator {
+  margin-bottom: 33vh; /* 距离底部约屏幕高度的1/3 */
+}
+
+@media (max-width: 768px) {
+  .scroll-indicator {
+    margin-bottom: 15vh; /* 移动端稍微调整 */
+  }
 }
 
