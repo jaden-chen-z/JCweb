@@ -41,7 +41,11 @@ export const VideoCharacter: React.FC = () => {
         setVideoAspect(vid.videoWidth / vid.videoHeight);
       }
       // Force a seek to 0 to ensure texture is ready
-      vid.currentTime = 0; 
+      vid.currentTime = 0;
+      // Play and pause to ensure the first frame is loaded for the texture
+      vid.play().then(() => {
+        vid.pause();
+      });
     };
 
     videoRef.current = vid;

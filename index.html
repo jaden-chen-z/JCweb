@@ -13,33 +13,4 @@
     <!-- Vite 这里的入口是 src/main.tsx -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-    
-    body {
-      font-family: 'Inter', 'Noto Sans SC', sans-serif;
-      background-color: #ffffff;
-      overflow: hidden; /* Handled by R3F ScrollControls */
-    }
-    
-    /* Custom Scrollbar Hide */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    /* Dynamic Laser/Holographic Animation */
-    @keyframes laser-shine {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
-    
-    .animate-laser {
-      background-size: 200% auto;
-      animation: laser-shine 2.5s linear infinite;
-    }
-  </style>
 </html>

@@ -2,18 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 这里可以加上你原来 html head 里的样式，比如隐藏滚动条 */
-body {
-  overflow: hidden; /* 让 R3F ScrollControls 接管滚动 */
-  background-color: #ffffff;
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #000000; /* Changed to black for debugging */
 }
 
+/* Custom Scrollbar Hide */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
