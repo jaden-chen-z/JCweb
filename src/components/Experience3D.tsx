@@ -1,0 +1,40 @@
+import React from 'react';
+import { ScrollControls, Scroll, Sparkles } from '@react-three/drei';
+import { VideoCharacter } from './VideoCharacter';
+import { Overlay } from './Overlay';
+
+export const Experience3D: React.FC = () => {
+  return (
+    <>
+      {/* 
+        Since we are using a video, we typically don't need 3D lights 
+        unless the video is mapped to a 3D object that needs to be lit.
+        For a "background video" feel, we use MeshBasicMaterial (unlit).
+      */}
+
+      {/* Scroll Controls - Damping adds smoothness to the scroll bar itself */}
+      <ScrollControls pages={6} damping={0.3}>
+        
+        {/* The Video Component controlled by scroll */}
+        <VideoCharacter />
+        
+        {/* Optional: Keep Sparkles for depth, put them in front of video */}
+        <Sparkles 
+          count={60} 
+          scale={10} 
+          size={2} 
+          speed={0.4} 
+          opacity={0.5} 
+          color="#10b981" 
+          position={[0, 0, 1]} // Bring slightly forward
+        />
+        
+        {/* HTML Content Overlay */}
+        <Scroll html style={{ width: '100%' }}>
+          <Overlay />
+        </Scroll>
+        
+      </ScrollControls>
+    </>
+  );
+};
